@@ -1,9 +1,8 @@
-import pandas as pd
-import numpy as np
-import seaborn as sns
-import matplotlib.pyplot as plt
-import plotly.express as px
-import kagglehub, os
+from sklearn.preprocessing import StandardScaler
+import kagglehub, os, pandas as pd, numpy as np, seaborn as sns, matplotlib.pyplot as plt, plotly.express as px
+
+
+var_objScalerCredit = StandardScaler()
 
 #Baixa o arquivo de dados de credito do Kaggle
 var_strPath = kagglehub.dataset_download(handle="laotse/credit-risk-dataset")
@@ -70,4 +69,50 @@ plt.hist(x=var_tblCredit['loan_amnt'])
 # plt.show()
 
 var_grfGrafico = px.scatter_matrix(var_tblCredit, dimensions=['person_age', 'person_income', 'loan_amnt'], color='cb_person_default_on_file')
-var_grfGrafico.show()
+# var_grfGrafico.show()
+
+var_tblMenorZero = var_tblCredit.loc[var_tblCredit['person_age'] < 0]
+# print(f"Valores menores que 0: \n{var_tblMenorZero}")
+
+# Apagando a coluna inteira
+var_tblCredit2 = var_tblCredit.drop(labels='person_age', axis=1)
+# print(var_tblCredit2)
+
+# Apagando somente os registros com valores inconsistentes
+var_tblCredit3 = var_tblCredit.drop(var_tblCredit[var_tblCredit['person_age'] < 0].index)
+# print(var_tblCredit3)
+
+# Preencher os valores inconsistente com a média das idades
+# print(var_tblCredit.mean())
+
+# print(var_tblCredit['person_age'].mean())
+
+var_tblCredit['person_age'][var_tblCredit['person_age'] > 0].mean()
+
+# var_tblCredit.loc[var_tblCredit['person_age'] < 0, 'person_age'] = 40.92
+
+# print(var_tblCredit.isnull())
+# print(var_tblCredit.isnull().sum())
+var_tblTreino = var_tblCredit
+var_tblTreino = var_tblTreino.drop(labels='person_home_ownership', axis=1)
+var_tblTreino = var_tblTreino.drop(labels='person_emp_length', axis=1)
+var_tblTreino = var_tblTreino.drop(labels='loan_intent', axis=1)
+var_tblTreino = var_tblTreino.drop(labels='loan_grade', axis=1)
+var_tblTreino = var_tblTreino.drop(labels='loan_int_rate', axis=1)
+var_tblTreino = var_tblTreino.drop(labels='loan_status', axis=1)
+var_tblTreino = var_tblTreino.drop(labels='loan_percent_income', axis=1)
+var_tblTreino = var_tblTreino.drop(labels='cb_person_cred_hist_length', axis=1)
+# print(var_tblTreino.isnull().sum())
+
+# print(var_tblTreino.loc(pd.isnull(var_tblTreino['person_age'])))
+var_tblTreino['person_age'].fillna(var_tblTreino['person_age'].mean(), inplace=True)
+
+var_tblXCredit = var_tblTreino.iloc[:, 1:4].values
+# print(var_tblXCredit)
+
+var_tblYCredit = var_tblTreino.iloc[:, :4].values
+# print(var_tblYCredit)
+
+# print(var_tblXCredit[:, 0])
+
+var_tblXCredit = var_objScalerCredit.fit_transform(var_tblXCredit)
