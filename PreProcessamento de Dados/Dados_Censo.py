@@ -7,7 +7,7 @@ import kagglehub, os, pandas as pd, numpy as np, seaborn as sns, matplotlib.pypl
 var_objScalerCredit = StandardScaler()
 
 #Recebe o arquivo e armazena em um DataFrame
-var_tblCredit = pd.read_csv("Machine Learning e Data Science com Python de A à Z\Bases de dados\credit_data.csv")
+var_tblCredit = pd.read_csv(r"Bases de dados\credit_data.csv")
 
 var_tblMenorZero = var_tblCredit.loc[var_tblCredit['age'] < 0]
 # print(f"Valores menores que 0: \n{var_tblMenorZero}")
@@ -29,7 +29,7 @@ var_tblYCredit = var_tblTreino.iloc[:, :4].values
 var_tblXCredit = var_objScalerCredit.fit_transform(var_tblXCredit)
 
 #Census
-var_CSVCensus = pd.read_csv(r'Machine Learning e Data Science com Python de A à Z\Bases de dados\census.csv')
+var_CSVCensus = pd.read_csv(r'Bases de dados\census.csv')
 # print(var_CSVCensus)
 # print(var_CSVCensus.describe())
 # print(var_CSVCensus.isnull().sum())
@@ -100,6 +100,22 @@ var_XTreinamentoCensus, var_XTesteCensus, var_YTreinamentoCensus, var_YTesteCens
 print(var_XTreinamentoCensus.shape, var_YTreinamentoCensus.shape)
 # int(var_XTesteCensus.shape, var_YTesteCensus.shape)
 
+#Risco Credito
+var_objRiscoCredito = pd.read_csv(filepath_or_buffer=r"Bases de dados\risco_credito.csv", encoding="utf-8", sep=",")
+
+var_XRiscoCredito = var_objRiscoCredito.iloc[:, 0:4].values
+var_YRiscoCredito = var_objRiscoCredito.iloc[:, 4].values
+
+var_labelencoderHistoria = LabelEncoder()
+var_labelencoderDivida = LabelEncoder()
+var_labelencoderGarantia = LabelEncoder()
+var_labelencoderRenda = LabelEncoder()
+
+var_XRiscoCredito[:, 0] = var_labelencoderHistoria.fit_transform(var_XRiscoCredito[:, 0])
+var_XRiscoCredito[:, 1] = var_labelencoderDivida.fit_transform(var_XRiscoCredito[:, 1])
+var_XRiscoCredito[:, 2] = var_labelencoderGarantia.fit_transform(var_XRiscoCredito[:, 2])
+var_XRiscoCredito[:, 3] = var_labelencoderRenda.fit_transform(var_XRiscoCredito[:, 3])
+
 #Salvar as variáveis
 with open('creditEstudo.pkl', mode='wb') as f:
     pickle.dump((var_XTreinamentoCredit, var_YTreinamentoCredit, var_XTesteCredit, var_YTesteCredit), f)
@@ -107,3 +123,6 @@ with open('creditEstudo.pkl', mode='wb') as f:
 
 with open('censusEstudo.pkl', mode='wb') as f:
     pickle.dump((var_XTreinamentoCensus, var_YTreinamentoCensus, var_XTesteCensus, var_YTesteCensus), f)
+
+with open('risco_creditoEstudo.pkl', mode='wb') as f:
+    pickle.dump([var_XRiscoCredito, var_YRiscoCredito], f)
